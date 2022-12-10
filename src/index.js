@@ -101,6 +101,24 @@ app.get("/games", async (req, res) => {
     res.send(games.rows);
 });
 
+//CRUD CLIENTES
+app.post("/customers", (req, res) => {});
+
+app.get("/customers", (req, res) => {});
+
+app.get("/customers/:id", (req, res) => {});
+
+app.put("/customers/:id", (req, res) => {});
+
+//CRUD ALUGUEIS
+app.post("/rentals", (req, res) => {});
+
+app.get("/rentals", (req, res) => {});
+
+app.post("/rentals/:id/return", (req, res) => {});
+
+app.delete("/rentals/:id", (req, res) => {});
+
 //CONEXÃO
 const PORT = process.env.PORT || 4000;
 
