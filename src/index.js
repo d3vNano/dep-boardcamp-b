@@ -51,6 +51,56 @@ app.get("/categories", async (req, res) => {
     res.send(categories.rows);
 });
 
+//CRUD JOGOS
+app.post("/games", async (req, res) => {
+    const { name, image, stockTotal, categoryId, pricePerDay } = req.body;
+
+    const gameExists = await connection.query(
+        "SELECT * FROM games WHERE name = $1",
+        [name]
+    );
+
+    const categoryExists = await connection.query(
+        "SELECT * FROM categories WHERE id = $1",
+        [categoryId]
+    );
+
+    if (
+        !name ||
+        stockTotal <= 0 ||
+        pricePerDay <= 0 ||
+        !categoryExists.rows[0]
+    ) {
+        console.log("1 DEU RUIM");
+        res.sendStatus(400);
+        return;
+    }
+
+    if (gameExists.rows[0]) {
+        console.log("2 DEU RUIM");
+        res.sendStatus(409);
+        return;
+    }
+
+    await connection.query(
+        'INSERT INTO games ("name", "image", "stockTotal", "categoryId", "pricePerDay") VALUES ($1, $2, $3, $4, $5)',
+        [name, image, stockTotal, categoryId, pricePerDay]
+    );
+
+    res.sendStatus(201);
+});
+
+app.get("/games", async (req, res) => {
+    const games = await connection.query(
+        `SELECT games.*, categories.name as "categoryName"
+        FROM games
+        JOIN categories
+        ON games."categoryId"=categories.id`
+    );
+
+    res.send(games.rows);
+});
+
 //CONEXÃO
 const PORT = process.env.PORT || 4000;
 
