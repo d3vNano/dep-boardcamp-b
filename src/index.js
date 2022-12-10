@@ -17,18 +17,25 @@ app.use(cors());
 app.use(express.json());
 
 //CRUD CATEGORIAS
-app.get("/categories", async (req, res) => {
-    const categories = await connection.query("SELECT * FROM categories;");
-
-    res.send(categories.rows);
-});
-
 app.post("/categories", async (req, res) => {
     const { name } = req.body;
 
+    const categoryExists = await connection.query(
+        `SELECT * FROM categories WHERE name = $1`,
+        [name]
+    );
+
     if (!name) {
         res.sendStatus(400);
+        return;
     }
+
+    if (categoryExists.rows[0]) {
+        res.sendStatus(409);
+        return;
+    }
+
+    console.log(categoryExists.rows[0]);
 
     const category = await connection.query(
         "INSERT INTO categories (name) VALUES ($1)",
@@ -38,6 +45,13 @@ app.post("/categories", async (req, res) => {
     res.sendStatus(201);
 });
 
+app.get("/categories", async (req, res) => {
+    const categories = await connection.query("SELECT * FROM categories;");
+
+    res.send(categories.rows);
+});
+
+//CONEXÃO
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
