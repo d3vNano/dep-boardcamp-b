@@ -102,7 +102,31 @@ app.get("/games", async (req, res) => {
 });
 
 //CRUD CLIENTES
-app.post("/customers", (req, res) => {});
+app.post("/customers", async (req, res) => {
+    const { name, phone, cpf, birthday } = req.body;
+
+    const customerExists = await connection.query(
+        `SELECT * FROM customers WHERE cpf=$1`,
+        [cpf]
+    );
+
+    if (cpf.length !== 11 || phone.length < 10 || !name || !birthday) {
+        res.sendStatus(400);
+        return;
+    }
+
+    if (customerExists.rows[0]) {
+        res.sendStatus(409);
+        return;
+    }
+
+    await connection.query(
+        `INSERT INTO customers (name, phone, cpf, birthday) VALUES ($1, $2, $3, $4)`,
+        [name, phone, cpf, birthday]
+    );
+
+    res.sendStatus(201);
+});
 
 app.get("/customers", (req, res) => {});
 
