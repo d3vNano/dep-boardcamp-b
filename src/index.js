@@ -128,11 +128,54 @@ app.post("/customers", async (req, res) => {
     res.sendStatus(201);
 });
 
-app.get("/customers", (req, res) => {});
+app.get("/customers", async (req, res) => {
+    const customers = await connection.query(`SELECT * FROM customers`);
 
-app.get("/customers/:id", (req, res) => {});
+    res.status(200).send(customers.rows);
+});
 
-app.put("/customers/:id", (req, res) => {});
+app.get("/customers/:id", async (req, res) => {
+    const { id } = req.params;
+
+    const customer = await connection.query(
+        `SELECT * FROM customers WHERE id=$1`,
+        [id]
+    );
+
+    if (!customer.rows[0]) {
+        res.sendStatus(404);
+        return;
+    }
+
+    res.send(customer.rows[0]);
+});
+
+app.put("/customers/:id", async (req, res) => {
+    const { id } = req.params;
+    const { name, phone, cpf, birthday } = req.body;
+
+    const customerExists = await connection.query(
+        `SELECT * FROM customers WHERE cpf=$1`,
+        [cpf]
+    );
+
+    if (cpf.length !== 11 || phone.length < 10 || !name || !birthday) {
+        res.sendStatus(400);
+        return;
+    }
+
+    if (customerExists.rows[0]) {
+        res.sendStatus(409);
+        return;
+    }
+
+    await connection.query(
+        `UPDATE customers SET name=$1, phone=$2, cpf=$3, birthday=$4 WHERE id=$5`,
+        [name, phone, cpf, birthday, id]
+    );
+
+    res.sendStatus(200);
+});
 
 //CRUD ALUGUEIS
 app.post("/rentals", (req, res) => {});
