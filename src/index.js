@@ -3,18 +3,11 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import dayjs from "dayjs";
-import pkg from "pg";
 
+import connection from "./database/db.js";
 import extractToObjFormat from "./functions/extractToObjFormat.js";
 
 dotenv.config();
-
-const { Pool } = pkg;
-
-const connection = new Pool({
-    connectionString: process.env.DATABASE_URL,
-});
-
 const app = express();
 app.use(cors());
 app.use(express.json());
