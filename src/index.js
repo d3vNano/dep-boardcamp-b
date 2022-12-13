@@ -315,7 +315,34 @@ app.get("/rentals", async (req, res) => {
 
 app.post("/rentals/:id/return", async (req, res) => {});
 
-app.delete("/rentals/:id", (req, res) => {});
+app.delete("/rentals/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const rental = await connection.query(
+            `
+        DELETE * FROM rentals
+        WHERE id=$1
+        `,
+            [id]
+        );
+
+        if (!rental.rows[0].id) {
+            res.sendStatus(404);
+            return;
+        }
+
+        if (!rental.rows[0].returnDate !== null) {
+            res.sendStatus(400);
+            return;
+        }
+
+        res.send(rental.rows[0]);
+    } catch (err) {
+        console.log(err.message);
+        res.sendStatus(500);
+    }
+});
 
 //CONEXÃO
 const PORT = process.env.PORT || 4000;
