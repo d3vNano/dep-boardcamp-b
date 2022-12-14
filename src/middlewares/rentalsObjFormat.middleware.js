@@ -1,4 +1,4 @@
-function extractToObjFormat(rentals) {
+function rentalsObjFormat(rentals) {
     return rentals.rows.map((obj) => {
         const {
             id,
@@ -34,4 +34,4 @@ function extractToObjFormat(rentals) {
     });
 }
 
-export default extractToObjFormat;
+export default rentalsObjFormat;

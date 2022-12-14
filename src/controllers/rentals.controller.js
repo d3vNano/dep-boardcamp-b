@@ -1,6 +1,8 @@
 import connection from "../database/db.js";
 import dayjs from "dayjs";
 
+import rentalsObjFormat from "../middlewares/rentalsObjFormat.middleware.js";
+
 async function insertRental(req, res) {
     const { customerId, gameId, daysRented } = req.body;
 
@@ -54,7 +56,7 @@ async function listRentals(req, res) {
             ON rentals."gameId" = games.id`
         );
 
-        const result = extractToObjFormat(rentals);
+        const result = rentalsObjFormat(rentals);
 
         res.send(result);
     } catch (err) {
